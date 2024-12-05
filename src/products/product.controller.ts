@@ -30,9 +30,8 @@ export class ProductController {
   async addPrice(
     @Param('id') id: number,
     @Body('price') price: number,
-    @Body('date', DateFormatPipe) date: Date,
     @Body('supermarket') supermarket: string,
   ): Promise<PriceHistory> {
-    return this.productService.addPrice(id, price, date, supermarket);
+    return this.productService.addPrice(id, price, supermarket);
   }
 }

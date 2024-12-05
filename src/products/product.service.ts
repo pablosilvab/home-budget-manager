@@ -28,7 +28,13 @@ export class ProductService {
       if (!product) {
         throw new Error('Product not found');
       }
-      return this.priceHistoryRepository.find({ where: { product }, order: { date: 'DESC' } });
+      const history = await this.priceHistoryRepository.find({ where: { product }, order: { price: 'ASC' } });
+
+      
+    return history.map(product => ({
+      ...product,
+      price: parseFloat(product.price.toString()),
+    }));
     }
 
   async createProduct(productData: { name: string; price: number }): Promise<Product> {
@@ -36,7 +42,7 @@ export class ProductService {
     return this.productRepository.save(product);
   }
 
-  async addPrice(productId: number, price: number, date: Date, supermarket: string): Promise<PriceHistory> {
+  async addPrice(productId: number, price: number, supermarket: string): Promise<PriceHistory> {
     const product = await this.productRepository.findOne({ where: { id: productId } });
     if (!product) {
       throw new Error('Product not found');
@@ -44,7 +50,7 @@ export class ProductService {
 
     const priceHistory = this.priceHistoryRepository.create({
       price,
-      date,
+      date: new Date(),
       supermarket,
       product,
     });
