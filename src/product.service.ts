@@ -14,8 +14,12 @@ export class ProductService {
   ) {}
 
   async getAllProducts(): Promise<Product[]> {
-    return this.productRepository.find();
-  }
+    const products = await this.productRepository.find();
+
+    return products.map(product => ({
+      ...product,
+      price: parseFloat(product.price.toString()),
+    }));  }
 
   async createProduct(productData: { name: string; price: number }): Promise<Product> {
     const product = this.productRepository.create(productData);

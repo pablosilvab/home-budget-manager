@@ -17,5 +17,5 @@ export class PriceHistory {
   date: Date;
 
   @Column()
-  supermarket: string;  // Agrega un campo para el supermercado
+  supermarket: string;
 }

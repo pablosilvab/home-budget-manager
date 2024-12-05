@@ -10,9 +10,9 @@ export class Product {
   @Column()
   name: string;
 
-  @Column('decimal')
-  price: number; // El precio actual del producto
+  @Column('decimal', { precision: 10, scale: 2 })  
+  price: number;
 
   @OneToMany(() => PriceHistory, (priceHistory) => priceHistory.product)
-  priceHistories: PriceHistory[]; // Relación con el historial de precios
+  priceHistories: PriceHistory[];
 }
