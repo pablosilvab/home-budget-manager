@@ -22,7 +22,7 @@ export class ProductController {
   }
 
   @Post()
-  async createProduct(@Body() productData: { name: string; price: number }): Promise<Product> {
+  async createProduct(@Body() productData: { name: string; price: number; supermarket: string}): Promise<Product> {
     return this.productService.createProduct(productData);
   }
 
