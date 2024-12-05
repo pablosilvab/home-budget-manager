@@ -6,6 +6,7 @@ import { PriceHistory } from './entities/price-history.entity';
 
 @Injectable()
 export class ProductService {
+  
   constructor(
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
@@ -20,6 +21,15 @@ export class ProductService {
       ...product,
       price: parseFloat(product.price.toString()),
     }));  }
+
+    
+    async getPriceHistory(productId: number): Promise<PriceHistory[]> {
+      const product = await this.productRepository.findOne({ where: { id: productId } });
+      if (!product) {
+        throw new Error('Product not found');
+      }
+      return this.priceHistoryRepository.find({ where: { product }, order: { date: 'DESC' } });
+    }
 
   async createProduct(productData: { name: string; price: number }): Promise<Product> {
     const product = this.productRepository.create(productData);

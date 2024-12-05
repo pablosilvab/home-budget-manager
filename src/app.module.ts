@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProductService } from './product.service';
-import { ProductController } from './product.controller';
-import { Product } from './entities/product.entity';
-import { PriceHistory } from './entities/price-history.entity'; 
+import { ProductService } from './products/product.service';
+import { ProductController } from './products/product.controller';
+import { Product } from './products/entities/product.entity';
+import { PriceHistory } from './products/entities/price-history.entity'; 
 import { ConfigModule } from '@nestjs/config';
 
 @Module({

@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, ParseIntPipe, UseInterceptors } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { Product } from './entities/product.entity';
 import { PriceHistory } from './entities/price-history.entity';
-import { DateFormatPipe } from './pipes/date-format.pipe';
+import { DateFormatPipe } from '../common/pipes/date-format.pipe';
+import { FormatDateInterceptor } from '../common/interceptors/format-date.interceptor';
 
 @Controller('products')
 export class ProductController {
@@ -11,6 +12,13 @@ export class ProductController {
   @Get()
   async getAllProducts(): Promise<Product[]> {
     return this.productService.getAllProducts();
+  }
+
+  @Get(':id/price-history')
+  @UseInterceptors(FormatDateInterceptor)
+  async getPriceHistory(@Param('id', ParseIntPipe) id: number) {
+    let priceHistory = this.productService.getPriceHistory(id);
+    return priceHistory;
   }
 
   @Post()
