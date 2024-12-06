@@ -66,6 +66,7 @@ export class ProductService {
     const lowestPrice = await this.priceHistoryRepository
       .createQueryBuilder('priceHistory')
       .select('MIN(priceHistory.price)', 'minPrice')
+      .where('priceHistory.productId = :productId', { productId })
       .getRawOne();
 
     product.price = lowestPrice.minPrice;
