@@ -1,4 +1,3 @@
-// src/entities/price-history.entity.ts
 import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from 'typeorm';
 import { Product } from './product.entity';
 
@@ -9,8 +8,8 @@ export class PriceHistory {
 
   @ManyToOne(() => Product, (product) => product.priceHistories)
   product: Product;
-  
-  @Column('decimal', { precision: 10, scale: 2 })  
+
+  @Column('decimal', { precision: 10, scale: 2 })
   price: number;
 
   @Column()
@@ -18,4 +17,11 @@ export class PriceHistory {
 
   @Column()
   supermarket: string;
+
+
+  @Column('double precision')
+  latitude: number;
+
+  @Column('double precision')
+  longitude: number;
 }

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { PriceHistory } from './entities/price-history.entity';
+import { ProductNotFoundException } from 'src/common/exception/product-not-found.exception';
 
 @Injectable()
 export class ProductService {
@@ -20,6 +21,7 @@ export class ProductService {
     return products.map(product => ({
       ...product,
       price: parseFloat(product.price.toString()),
+      google_maps_link: `https://www.google.com/maps?q=${product.latitude},${product.longitude}`
     }));
   }
 
@@ -27,7 +29,7 @@ export class ProductService {
   async getPriceHistory(productId: number): Promise<PriceHistory[]> {
     const product = await this.productRepository.findOne({ where: { id: productId } });
     if (!product) {
-      throw new Error('Product not found');
+      throw new ProductNotFoundException(productId);
     }
     const history = await this.priceHistoryRepository.find({ where: { product }, order: { price: 'ASC' } });
 
@@ -38,20 +40,20 @@ export class ProductService {
     }));
   }
 
-  async createProduct(productData: { name: string; price: number; supermarket: string }): Promise<Product> {
+  async createProduct(productData: { name: string; price: number; supermarket: string; latitude: number; longitude: number }): Promise<Product> {
     const product = this.productRepository.create(productData);
 
     const savedProduct = await this.productRepository.save(product);
 
-    this.addPrice(savedProduct.id, savedProduct.price, productData.supermarket);
+    this.addPrice(savedProduct.id, savedProduct.price, productData.supermarket, productData.latitude, productData.longitude);
 
     return savedProduct;
   }
 
-  async addPrice(productId: number, price: number, supermarket: string): Promise<PriceHistory> {
+  async addPrice(productId: number, price: number, supermarket: string, latitude: number, longitude: number): Promise<PriceHistory> {
     const product = await this.productRepository.findOne({ where: { id: productId } });
     if (!product) {
-      throw new Error('Product not found');
+      throw new ProductNotFoundException(productId)
     }
 
     const priceHistory = this.priceHistoryRepository.create({
@@ -59,17 +61,28 @@ export class ProductService {
       date: new Date(),
       supermarket,
       product,
+      latitude,
+      longitude
     });
 
     const priceHistorySaved = await this.priceHistoryRepository.save(priceHistory);
 
-    const lowestPrice = await this.priceHistoryRepository
+    const lowestPriceWithLocation = await this.priceHistoryRepository
       .createQueryBuilder('priceHistory')
-      .select('MIN(priceHistory.price)', 'minPrice')
+      .select([
+        'priceHistory.price AS minprice',
+        'priceHistory.latitude AS latitude',
+        'priceHistory.longitude AS longitude',
+      ])
       .where('priceHistory.productId = :productId', { productId })
+      .orderBy('priceHistory.price', 'ASC')
       .getRawOne();
 
-    product.price = lowestPrice.minPrice;
+
+    product.price = lowestPriceWithLocation.minprice;
+    product.latitude = lowestPriceWithLocation.latitude;
+    product.longitude = lowestPriceWithLocation.longitude;
+
 
     await this.productRepository.save(product)
 

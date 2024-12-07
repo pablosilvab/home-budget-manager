@@ -7,7 +7,7 @@ import { FormatDateInterceptor } from '../common/interceptors/format-date.interc
 
 @Controller('products')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(private readonly productService: ProductService) { }
 
   @Get()
   async getAllProducts(): Promise<Product[]> {
@@ -22,7 +22,7 @@ export class ProductController {
   }
 
   @Post()
-  async createProduct(@Body() productData: { name: string; price: number; supermarket: string}): Promise<Product> {
+  async createProduct(@Body() productData: { name: string; price: number; supermarket: string; latitude: number; longitude: number }): Promise<Product> {
     return this.productService.createProduct(productData);
   }
 
@@ -31,7 +31,9 @@ export class ProductController {
     @Param('id') id: number,
     @Body('price') price: number,
     @Body('supermarket') supermarket: string,
+    @Body('latitude') latitude: number,
+    @Body('longitude') longitude: number,
   ): Promise<PriceHistory> {
-    return this.productService.addPrice(id, price, supermarket);
+    return this.productService.addPrice(id, price, supermarket, latitude, longitude);
   }
 }

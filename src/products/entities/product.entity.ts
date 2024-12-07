@@ -1,4 +1,3 @@
-// src/entities/product.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { PriceHistory } from './price-history.entity';
 
@@ -10,8 +9,14 @@ export class Product {
   @Column()
   name: string;
 
-  @Column('decimal', { precision: 10, scale: 2 })  
+  @Column('decimal', { precision: 10, scale: 2 })
   price: number;
+
+  @Column('double precision')
+  latitude: number;
+
+  @Column('double precision')
+  longitude: number;
 
   @OneToMany(() => PriceHistory, (priceHistory) => priceHistory.product)
   priceHistories: PriceHistory[];
