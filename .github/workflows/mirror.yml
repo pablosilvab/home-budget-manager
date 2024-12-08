@@ -12,6 +12,12 @@ jobs:
     steps:
       - name: Checkout the code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  
+
+      - name: Fetch all history
+        run: |
+          git fetch --unshallow  # Esto convierte el clon "shallow" a un clon completo
 
       - name: Push to GitLab
         env:
