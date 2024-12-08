@@ -3,7 +3,7 @@ name: Mirror to GitLab
 on:
   push:
     branches:
-      - main  
+      - main
 
 jobs:
   mirror:
@@ -13,11 +13,13 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  
+          fetch-depth: 0
 
-      - name: Fetch all history
+      - name: Ensure full history
         run: |
-          git fetch --unshallow  # Esto convierte el clon "shallow" a un clon completo
+          if [ -f .git/shallow ]; then
+            git fetch --unshallow
+          fi
 
       - name: Push to GitLab
         env:
