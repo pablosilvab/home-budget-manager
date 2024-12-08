@@ -18,7 +18,7 @@ deploy:
   stage: deploy
   script:
     - echo "Deploying to Render..."
-    - curl -s "${RENDER_DEPLOY_BASE_URL}?key=${RENDER_DEPLOY_KEY}"
+    - curl -v "${RENDER_DEPLOY_BASE_URL}?key=${RENDER_DEPLOY_KEY}"
   only:
     - main
   when: on_success
