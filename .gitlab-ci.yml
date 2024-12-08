@@ -2,6 +2,8 @@ stages:
   - test
   - deploy
 
+image: node:16
+
 before_script:
   - npm install
 
