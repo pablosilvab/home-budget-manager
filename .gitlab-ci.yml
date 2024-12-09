@@ -1,3 +1,9 @@
+
+
+variables:
+  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  
+  GIT_DEPTH: "0" 
+
 stages:
   - test
   - sonarcloud-check
@@ -15,11 +21,8 @@ test:
   only:
     - main
 
-
-variables:
-  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  
-  GIT_DEPTH: "0" 
 sonarcloud-check:
+  stage: sonarcloud-check
   image:
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: [""]
@@ -30,9 +33,7 @@ sonarcloud-check:
   script:
     - sonar-scanner
   only:
-    - merge_requests
     - main
-    - develop
 
 
 deploy:
