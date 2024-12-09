@@ -1,23 +1,37 @@
-
-
 variables:
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  
   GIT_DEPTH: "0" 
 
 stages:
+  - install
   - test
+  - coverage
   - sonarcloud-check
   - deploy
 
 image: node:16
 
-before_script:
-  - npm install
+install_dependencies:
+  stage: install
+  script:
+    - npm install
+  only:
+    - main
 
 test:
   stage: test
   script:
+    - npm run test
+  only:
+    - main
+
+coverage:
+  stage: coverage
+  script:
     - npm run test:cov
+  artifacts:
+    paths:
+      - coverage/
   only:
     - main
 
