@@ -18,8 +18,8 @@ module.exports = {
   reporters: [
     'default',
     ['jest-junit', {
-      outputDirectory: '../coverage',
-      outputName: 'test-report.xml',
+      outputDirectory: '../coverage', 
+      outputName: 'test-report.xml',  
     }],
   ],
   testEnvironment: 'node',
