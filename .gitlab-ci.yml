@@ -11,17 +11,27 @@ stages:
 
 image: node:16
 
-install_dependencies:
+install:
   stage: install
   script:
     - npm install
+  artifacts:
+    paths:
+      - node_modules/
+    expire_in: 1h
   only:
     - main
 
 test:
   stage: test
+  dependencies:
+    - install
   script:
-    - npm run test
+    - npx jest --coverage
+  artifacts:
+    paths:
+      - coverage/
+    expire_in: 1h
   only:
     - main
 
