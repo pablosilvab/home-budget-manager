@@ -3,7 +3,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductNotFoundException } from 'src/common/exception/product-not-found.exception';
 import { RabbitMQException } from 'src/common/exception/rabbit-mq.exception';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { PriceHistory } from './entities/price-history.entity';
 import { Product, ProductStatus } from './entities/product.entity';
 
@@ -19,8 +19,9 @@ export class ProductService {
   ) { }
 
   async getAllProducts(): Promise<Product[]> {
-    const products = await this.productRepository.find();
-
+    const products = await this.productRepository.find({
+      where: { status: Not(ProductStatus.DELETED) }, 
+    });
     return products.map((product) => ({
       ...product,
       price: parseFloat(product.price.toString()),

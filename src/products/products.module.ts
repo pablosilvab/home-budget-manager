@@ -9,7 +9,6 @@ import { ProductService } from './products.service';
 
 @Module({
   imports: [
-
     ConfigModule.forRoot({
       isGlobal: true,
     }),
