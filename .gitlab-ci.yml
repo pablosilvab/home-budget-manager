@@ -61,7 +61,7 @@ sonarcloud-check:
 
 deploy:
   stage: deploy
-  image: curlimages/curl:latest
+  image: alpine:latest
   script:
     - echo "Iniciando despliegue en Render..."
     - |
