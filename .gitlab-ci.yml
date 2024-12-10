@@ -61,30 +61,10 @@ sonarcloud-check:
 
 deploy:
   stage: deploy
-  image: alpine:latest
+  image: curlimages/curl:latest
   script:
-    - apk update && apk add --no-cache curl jq
-    - curl --version
-    - jq --version
-    - echo "Iniciando despliegue en Render..."
-    - |
-      # Solicitar el despliegue
-      DEPLOY_RESPONSE=$(curl -v "${RENDER_DEPLOY_URL}")
-      echo "Respuesta del webhook de despliegue: $DEPLOY_RESPONSE"
-      
-      # Extraer el ID del despliegue desde la respuesta
-      DEPLOY_ID=$(echo $DEPLOY_RESPONSE | jq -r '.deploy.id')
-      echo "ID del despliegue: $DEPLOY_ID"
-      
-      if [ "$DEPLOY_ID" == "null" ] || [ -z "$DEPLOY_ID" ]; then
-        echo "Error: No se pudo obtener el ID del despliegue."
-        exit 1
-      fi
-
-      echo "Realizando el curl..."
-      DEPLOY_STATUS_RESPONSE=$(curl -s "https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys/$DEPLOY_ID" --header "Authorization: Bearer ${RENDER_API_TOKEN}")
-
-      echo "Respuesta cruda del webhook: $DEPLOY_STATUS_RESPONSE"
+    - echo "Deploying to Render..."
+    - curl -v "${RENDER_DEPLOY_URL}"
   only:
     - main
   when: on_success
