@@ -63,24 +63,25 @@ deploy:
   stage: deploy
   image: alpine:latest
   script:
-    - apk update && apk add --no-cache curl jq # Instalación de curl y jq
-    - curl --version # Verificar curl
-    - jq --version # Verificar jq
+    - apk update && apk add --no-cache curl jq
+    - curl --version
+    - jq --version
     - |
       DEPLOY_RESPONSE=$(curl -s "${RENDER_DEPLOY_URL}")
-      echo "Respuesta del webhook: $DEPLOY_RESPONSE"  # Verificar el contenido completo de la respuesta
-      DEPLOY_ID=$(echo $DEPLOY_RESPONSE | jq -r '.deploy.id')  # Obtener el id del despliegue
+      echo "Respuesta del webhook: $DEPLOY_RESPONSE"
+      DEPLOY_ID=$(echo $DEPLOY_RESPONSE | jq -r '.deploy.id')
       echo "ID del despliegue: $DEPLOY_ID"
 
-      # Verificar que DEPLOY_ID no sea null
       if [ "$DEPLOY_ID" == "null" ] || [ -z "$DEPLOY_ID" ]; then
         echo "Error: No se pudo obtener el ID del despliegue. Respuesta incompleta."
         exit 1
       fi
 
-      echo "Esperando a que finalice el despliegue..."
-      while true; do
-        DEPLOY_STATUS=$(curl -s "https://api.render.com/v1/deploys/$DEPLOY_ID" | jq -r '.status')
+      DEPLOY_STATUS_RESPONSE=$(curl -s "https://api.render.com/v1/deploys/$DEPLOY_ID")
+      echo "Respuesta del estado del despliegue: $DEPLOY_STATUS_RESPONSE"
+
+      DEPLOY_STATUS=$(echo $DEPLOY_STATUS_RESPONSE | jq -r '.status' 2>/dev/null)
+      if [ $? -eq 0 ]; then
         echo "Estado del despliegue: $DEPLOY_STATUS"
         if [ "$DEPLOY_STATUS" == "live" ]; then
           echo "El despliegue fue exitoso."
@@ -92,4 +93,7 @@ deploy:
           echo "Esperando 10 segundos antes de volver a verificar..."
           sleep 10
         fi
-      done
+      else
+        echo "Error: La respuesta no es un JSON válido o el campo 'status' no está presente."
+        echo "Respuesta completa: $DEPLOY_STATUS_RESPONSE"
+        exit 1
