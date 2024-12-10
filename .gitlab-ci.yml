@@ -64,17 +64,12 @@ deploy:
   image: curlimages/curl:latest
   script:
     - echo "Iniciando despliegue en Render..."
-    # Realiza la solicitud al webhook y guarda la respuesta
-    - DEPLOY_RESPONSE=$(curl -s "${RENDER_DEPLOY_URL}")
-    - echo "Respuesta del webhook: $DEPLOY_RESPONSE"
-    
-    # Extrae el ID del despliegue de la respuesta (si Render lo incluye)
-    - DEPLOY_ID=$(echo $DEPLOY_RESPONSE | jq -r '.id')
-    - echo "ID del despliegue: $DEPLOY_ID"
-
-    # Revisa periódicamente el estado del despliegue
-    - echo "Esperando a que finalice el despliegue..."
     - |
+      DEPLOY_RESPONSE=$(curl -s "${RENDER_DEPLOY_URL}")
+      echo "Respuesta del webhook: $DEPLOY_RESPONSE"
+      DEPLOY_ID=$(echo $DEPLOY_RESPONSE | jq -r '.id')
+      echo "ID del despliegue: $DEPLOY_ID"
+      echo "Esperando a que finalice el despliegue..."
       while true; do
         DEPLOY_STATUS=$(curl -s "https://api.render.com/v1/deploys/$DEPLOY_ID" | jq -r '.status')
         echo "Estado del despliegue: $DEPLOY_STATUS"
