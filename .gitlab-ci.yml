@@ -81,11 +81,10 @@ deploy:
         exit 1
       fi
 
-      # Consultar el estado del despliegue
-      echo "Esperando a que finalice el despliegue..."
-      DEPLOY_STATUS_RESPONSE=$(curl -s "https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys/$DEPLOY_ID" --header "Authorization: Bearer ${RENDER_API_TOKEN}")        
-      
-      echo "Respuesta del webhook de status: $DEPLOY_STATUS_RESPONSE"
+      echo "Realizando el curl..."
+      DEPLOY_STATUS_RESPONSE=$(curl -s "https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys/$DEPLOY_ID" --header "Authorization: Bearer ${RENDER_API_TOKEN}")
+
+      echo "Respuesta cruda del webhook: $DEPLOY_STATUS_RESPONSE"
   only:
     - main
   when: on_success
