@@ -83,27 +83,9 @@ deploy:
 
       # Consultar el estado del despliegue
       echo "Esperando a que finalice el despliegue..."
-      while true; do
-          DEPLOY_FINISHED_AT=$(curl -s --location "https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys/$DEPLOY_ID" \
-          --header "Authorization: Bearer ${RENDER_API_TOKEN}"  | jq -r '.finishedAt')        echo "Fecha de finalización del despliegue: $DEPLOY_FINISHED_AT"
-        
-        if [ "$DEPLOY_FINISHED_AT" != "null" ]; then
-          echo "El despliegue ha finalizado. Verificando el estado..."
-          # Ahora verificamos el estado del despliegue
-          DEPLOY_STATUS=$(curl -s "https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys/$DEPLOY_ID" | jq -r '.status')
-          
-          if [ "$DEPLOY_STATUS" == "live" ]; then
-            echo "El despliegue fue exitoso."
-            break
-          else
-            echo "El despliegue falló. Estado: $DEPLOY_STATUS"
-            exit 1
-          fi
-        else
-          echo "El despliegue aún no ha finalizado. Esperando 10 segundos antes de volver a verificar..."
-          sleep 10
-        fi
-      done
+      DEPLOY_STATUS_RESPONSE=$(curl -v "https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys/$DEPLOY_ID" --header "Authorization: Bearer ${RENDER_API_TOKEN}")        
+      
+      echo "Respuesta del webhook de status: $DEPLOY_STATUS_RESPONSE"
   only:
     - main
   when: on_success
