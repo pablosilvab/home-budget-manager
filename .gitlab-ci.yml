@@ -67,33 +67,24 @@ deploy:
     - curl --version
     - jq --version
     - |
-      DEPLOY_RESPONSE=$(curl -s "${RENDER_DEPLOY_URL}")
+      DEPLOY_RESPONSE=$(curl -s -H "Authorization: Bearer ${RENDER_API_KEY}" "https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys/${DEPLOY_ID}")
       echo "Respuesta del webhook: $DEPLOY_RESPONSE"
-      DEPLOY_ID=$(echo $DEPLOY_RESPONSE | jq -r '.deploy.id')
-      echo "ID del despliegue: $DEPLOY_ID"
+      DEPLOY_STATUS=$(echo $DEPLOY_RESPONSE | jq -r '.status')
 
-      if [ "$DEPLOY_ID" == "null" ] || [ -z "$DEPLOY_ID" ]; then
-        echo "Error: No se pudo obtener el ID del despliegue. Respuesta incompleta."
+      if [ "$DEPLOY_STATUS" == "null" ] || [ -z "$DEPLOY_STATUS" ]; then
+        echo "Error: No se pudo obtener el estado del despliegue. Respuesta incompleta."
         exit 1
       fi
 
-      DEPLOY_STATUS_RESPONSE=$(curl -s "https://api.render.com/v1/deploys/$DEPLOY_ID")
-      echo "Respuesta del estado del despliegue: $DEPLOY_STATUS_RESPONSE"
-
-      DEPLOY_STATUS=$(echo $DEPLOY_STATUS_RESPONSE | jq -r '.status' 2>/dev/null)
-      if [ $? -eq 0 ]; then
-        echo "Estado del despliegue: $DEPLOY_STATUS"
-        if [ "$DEPLOY_STATUS" == "live" ]; then
-          echo "El despliegue fue exitoso."
-          break
-        elif [ "$DEPLOY_STATUS" == "failed" ]; then
-          echo "El despliegue falló."
-          exit 1
-        else
-          echo "Esperando 10 segundos antes de volver a verificar..."
-          sleep 10
-        fi
-      else
-        echo "Error: La respuesta no es un JSON válido o el campo 'status' no está presente."
-        echo "Respuesta completa: $DEPLOY_STATUS_RESPONSE"
+      echo "Estado del despliegue: $DEPLOY_STATUS"
+      if [ "$DEPLOY_STATUS" == "live" ]; then
+        echo "El despliegue fue exitoso."
+      elif [ "$DEPLOY_STATUS" == "failed" ]; then
+        echo "El despliegue falló."
         exit 1
+      else
+        echo "El estado del despliegue es: $DEPLOY_STATUS"
+      fi
+  only:
+    - main
+  when: on_success
