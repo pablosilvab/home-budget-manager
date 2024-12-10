@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Product } from './entities/product.entity';
+import { Product, ProductStatus } from './entities/product.entity';
 import { PriceHistory } from './entities/price-history.entity';
 import { ProductNotFoundException } from 'src/common/exception/product-not-found.exception';
+import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 
 @Injectable()
 export class ProductService {
@@ -13,6 +14,7 @@ export class ProductService {
     private productRepository: Repository<Product>,
     @InjectRepository(PriceHistory)
     private priceHistoryRepository: Repository<PriceHistory>,
+    @Inject('PRODUCTS_SERVICE') private rabbitClient: ClientProxy,
   ) { }
 
   async getAllProducts(): Promise<Product[]> {
@@ -88,4 +90,27 @@ export class ProductService {
 
     return priceHistorySaved;
   }
+
+  async markForDeletion(id: number): Promise<void> {
+    const product = await this.productRepository.findOne({ where: { id } });
+
+    if (!product) {
+      throw new ProductNotFoundException(id);
+    }
+
+    product.status = ProductStatus.MARKED_FOR_DELETION;
+    await this.productRepository.save(product);
+
+    const message = {
+      id,
+      status: 'MARKED_FOR_DELETION',
+    };
+
+
+    console.log('Emitiendo mensaje para eliminar producto:', message);
+
+    this.rabbitClient.emit('delete-product', JSON.stringify(message));
+  }
 }
+
+

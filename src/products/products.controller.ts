@@ -1,13 +1,13 @@
-import { Controller, Get, Post, Body, Param, ParseIntPipe, UseInterceptors } from '@nestjs/common';
-import { ProductService } from './product.service';
-import { Product } from './entities/product.entity';
-import { PriceHistory } from './entities/price-history.entity';
-import { DateFormatPipe } from '../common/pipes/date-format.pipe';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseInterceptors } from '@nestjs/common';
 import { FormatDateInterceptor } from '../common/interceptors/format-date.interceptor';
+import { PriceHistory } from './entities/price-history.entity';
+import { Product } from './entities/product.entity';
+import { ProductService } from './products.service';
 
 @Controller('products')
 export class ProductController {
-  constructor(private readonly productService: ProductService) { }
+  constructor(private readonly productService: ProductService,
+  ) { }
 
   @Get()
   async getAllProducts(): Promise<Product[]> {
@@ -35,5 +35,17 @@ export class ProductController {
     @Body('longitude') longitude: number,
   ): Promise<PriceHistory> {
     return this.productService.addPrice(id, price, supermarket, latitude, longitude);
+  }
+
+  @Delete(':id')
+  async deleteProduct(@Param('id') id: number) {
+    await this.productService.markForDeletion(id);
+    return {
+      message: 'Producto marcado para eliminación.',
+      data: {
+        productId: id,
+        status: 'MARKED_FOR_DELETION',
+      },
+    };
   }
 }
