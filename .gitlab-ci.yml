@@ -61,8 +61,11 @@ sonarcloud-check:
 
 deploy:
   stage: deploy
-  image: curlimages/curl:latest
+  image: alpine:latest
   script:
+    - apk update && apk add --no-cache curl jq
+    - curl --version
+    - jq --version
     - echo "Iniciando despliegue en Render..."
     - |
       # Solicitar el despliegue
