@@ -92,25 +92,30 @@ export class ProductService {
   }
 
   async markForDeletion(id: number): Promise<void> {
-    const product = await this.productRepository.findOne({ where: { id } });
-
-    if (!product) {
-      throw new ProductNotFoundException(id);
+    try {
+      const product = await this.productRepository.findOne({ where: { id } });
+  
+      if (!product) {
+        throw new ProductNotFoundException(id);
+      }
+  
+      product.status = ProductStatus.MARKED_FOR_DELETION;
+      await this.productRepository.save(product);
+  
+      const message = {
+        id,
+        status: 'MARKED_FOR_DELETION',
+      };
+  
+      console.log('Emitiendo mensaje para eliminar producto:', message);
+  
+      this.rabbitClient.emit('delete-product', JSON.stringify(message));
+    } catch (error) {
+      console.error('Error en markForDeletion:', error);
+      throw error; 
     }
-
-    product.status = ProductStatus.MARKED_FOR_DELETION;
-    await this.productRepository.save(product);
-
-    const message = {
-      id,
-      status: 'MARKED_FOR_DELETION',
-    };
-
-
-    console.log('Emitiendo mensaje para eliminar producto:', message);
-
-    this.rabbitClient.emit('delete-product', JSON.stringify(message));
   }
+  
 }
 
 
