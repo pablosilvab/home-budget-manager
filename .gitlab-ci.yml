@@ -68,9 +68,16 @@ deploy:
     - jq --version # Verificar jq
     - |
       DEPLOY_RESPONSE=$(curl -s "${RENDER_DEPLOY_URL}")
-      echo "Respuesta del webhook: $DEPLOY_RESPONSE"
-      DEPLOY_ID=$(echo $DEPLOY_RESPONSE | jq -r '.id')
+      echo "Respuesta del webhook: $DEPLOY_RESPONSE"  # Verificar el contenido completo de la respuesta
+      DEPLOY_ID=$(echo $DEPLOY_RESPONSE | jq -r '.deploy.id')  # Obtener el id del despliegue
       echo "ID del despliegue: $DEPLOY_ID"
+
+      # Verificar que DEPLOY_ID no sea null
+      if [ "$DEPLOY_ID" == "null" ] || [ -z "$DEPLOY_ID" ]; then
+        echo "Error: No se pudo obtener el ID del despliegue. Respuesta incompleta."
+        exit 1
+      fi
+
       echo "Esperando a que finalice el despliegue..."
       while true; do
         DEPLOY_STATUS=$(curl -s "https://api.render.com/v1/deploys/$DEPLOY_ID" | jq -r '.status')
