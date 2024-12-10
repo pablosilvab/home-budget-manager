@@ -31,8 +31,8 @@ Asegúrate de tener instalados los siguientes elementos en tu sistema:
 
 1. Clona el repositorio:
 ```bash
-git clone https://gitlab.com/<your-group>/<your-project>.git
-cd <your-project>
+git clone https://github.com/pablosilvab/home-budget-manager.git
+cd home-budget-manager
 ```
 
 2. Instalar dependencias:
@@ -43,7 +43,6 @@ npm install
 3. Configura las variables de entorno creando un archivo .env:
 ```
 DATABASE_URL=<tu-base-de-datos>
-API_KEY=<tu-api-key>
 ```
 
 
