@@ -63,7 +63,9 @@ deploy:
   stage: deploy
   image: alpine:latest
   script:
-    - echo "Iniciando despliegue en Render..."
+    - apk update && apk add --no-cache curl jq # Instalación de curl y jq
+    - curl --version # Verificar curl
+    - jq --version # Verificar jq
     - |
       DEPLOY_RESPONSE=$(curl -s "${RENDER_DEPLOY_URL}")
       echo "Respuesta del webhook: $DEPLOY_RESPONSE"
@@ -84,6 +86,3 @@ deploy:
           sleep 10
         fi
       done
-  only:
-    - main
-  when: on_success
