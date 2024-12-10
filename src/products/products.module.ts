@@ -18,8 +18,8 @@ import { ProductService } from './products.service';
         name: 'PRODUCTS_SERVICE',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://localhost:5672'],
-          queue: 'products-queue',
+          urls: [process.env.RABBITMQ_URL],
+          queue: process.env.RABBITMQ_QUEUE,
         },
       },
     ]),
