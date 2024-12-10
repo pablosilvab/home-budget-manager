@@ -66,7 +66,7 @@ deploy:
     - echo "Iniciando despliegue en Render..."
     - |
       # Solicitar el despliegue
-      DEPLOY_RESPONSE=$(curl -s -X POST "https://api.render.com/deploy/${RENDER_SERVICE_ID}?key=${RENDER_API_KEY}")
+      DEPLOY_RESPONSE=$(curl -v "${RENDER_DEPLOY_URL}")
       echo "Respuesta del webhook de despliegue: $DEPLOY_RESPONSE"
       
       # Extraer el ID del despliegue desde la respuesta
