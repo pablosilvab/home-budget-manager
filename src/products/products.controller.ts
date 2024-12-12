@@ -17,12 +17,11 @@ export class ProductController {
   @Get(':id/price-history')
   @UseInterceptors(FormatDateInterceptor)
   async getPriceHistory(@Param('id', ParseIntPipe) id: number) {
-    let priceHistory = this.productService.getPriceHistory(id);
-    return priceHistory;
+    return this.productService.getPriceHistory(id);
   }
 
   @Post()
-  async createProduct(@Body() productData: { name: string; price: number; supermarket: string; latitude: number; longitude: number }): Promise<Product> {
+  async createProduct(@Body() productData: { name: string; price: number; supermarketId?: number; supermarketName?: string; latitude: number; longitude: number }): Promise<Product> {
     return this.productService.createProduct(productData);
   }
 
@@ -30,11 +29,11 @@ export class ProductController {
   async addPrice(
     @Param('id') id: number,
     @Body('price') price: number,
-    @Body('supermarket') supermarket: string,
+    @Body('supermarketName') supermarketName: string,
     @Body('latitude') latitude: number,
     @Body('longitude') longitude: number,
   ): Promise<PriceHistory> {
-    return this.productService.addPrice(id, price, supermarket, latitude, longitude);
+    return this.productService.addPrice(id, price, supermarketName, latitude, longitude);
   }
 
   @Delete(':id')

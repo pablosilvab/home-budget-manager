@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 module.exports = {
   moduleFileExtensions: [
     'js',
@@ -30,5 +31,8 @@ module.exports = {
       functions: 10,
       lines: 10,
     },
+  },
+  moduleNameMapper: {
+    '^src/(.*)$': '<rootDir>/$1', 
   },
 };

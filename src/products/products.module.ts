@@ -6,6 +6,7 @@ import { PriceHistory } from './entities/price-history.entity';
 import { Product } from './entities/product.entity';
 import { ProductController } from './products.controller';
 import { ProductService } from './products.service';
+import { Supermarket } from 'src/supermarkets/entities/supermarket.entity';
 
 @Module({
   imports: [
@@ -22,16 +23,7 @@ import { ProductService } from './products.service';
         },
       },
     ]),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      url: process.env.DATABASE_URL,
-      entities: [Product, PriceHistory],
-      synchronize: process.env.TYPEORM_SYNC === 'true',
-      ssl: process.env.NODE_ENV === 'production'
-        ? { rejectUnauthorized: false }
-        : false
-    }),
-    TypeOrmModule.forFeature([Product, PriceHistory]),
+    TypeOrmModule.forFeature([Product, PriceHistory, Supermarket]),
   ],
   controllers: [ProductController],
   providers: [ProductService],

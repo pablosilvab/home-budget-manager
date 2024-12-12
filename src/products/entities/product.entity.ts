@@ -19,11 +19,6 @@ export class Product {
   @Column('decimal', { precision: 10, scale: 2 })
   price: number;
 
-  @Column('double precision')
-  latitude: number;
-
-  @Column('double precision')
-  longitude: number;
 
   @Column({
     type: 'enum',
