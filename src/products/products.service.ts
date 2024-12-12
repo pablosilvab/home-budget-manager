@@ -170,7 +170,7 @@ export class ProductService {
     return priceHistorySaved;
   }
 
-  
+
   async markForDeletion(id: number): Promise<void> {
     const product = await this.productRepository.findOne({ where: { id } });
 
