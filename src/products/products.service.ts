@@ -110,16 +110,50 @@ export class ProductService {
     });
     const savedProduct = await this.productRepository.save(product);
 
-    this.addPrice(
-      savedProduct.id,
+    this.addPriceWithExistentMarket(
+      savedProduct,
       savedProduct.price,
-      supermarket.id,
-      productData.latitude,
-      productData.longitude,
+      supermarket
     );
 
     return savedProduct;
   }
+
+  async addPriceWithExistentMarket(
+    product: Product,
+    price: number,
+    supermarket: Supermarket,
+  ): Promise<PriceHistory> {
+    
+    const priceHistory = this.priceHistoryRepository.create({
+      price,
+      date: new Date(),
+      supermarket,
+      product,
+    });
+
+    const priceHistorySaved =
+      await this.priceHistoryRepository.save(priceHistory);
+
+    const lowestPriceWithLocation = await this.priceHistoryRepository
+      .createQueryBuilder('priceHistory')
+      .select([
+        'priceHistory.price AS minprice'
+      ])
+      .where('priceHistory.productId = :productId', { productId: product.id  })
+      .orderBy('priceHistory.price', 'ASC')
+      .getRawOne();
+
+    product.price = lowestPriceWithLocation.minprice;
+    // product.latitude = lowestPriceWithLocation.latitude;
+    // product.longitude = lowestPriceWithLocation.longitude;
+    await this.productRepository.save(product);
+
+    return priceHistorySaved;
+  }
+
+
+
 
   async addPrice(
     productId: number,
