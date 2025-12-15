@@ -4,6 +4,11 @@ import { PriceHistory } from './entities/price-history.entity';
 import { Product } from './entities/product.entity';
 import { ProductService } from './products.service';
 
+/**
+ * Controlador de productos
+ * @Controller es un decorador que define la clase como un controlador de Nest.js
+ * @Controller('products') define la ruta base para todas las rutas definidas en este controlador
+ */
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService,

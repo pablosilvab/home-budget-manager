@@ -1,13 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductNotFoundException } from 'src/common/exception/product-not-found.exception';
-import { RabbitMQException } from 'src/common/exception/rabbit-mq.exception';
 import { Supermarket } from 'src/supermarkets/entities/supermarket.entity';
 import { Not, Repository } from 'typeorm';
 import { PriceHistory } from './entities/price-history.entity';
 import { Product, ProductStatus } from './entities/product.entity';
 
+/**
+ * Servicio de productos
+ * @Injectable es un decorador que define la clase como un servicio de Nest.js
+ * Un servicio es una clase que contiene la lógica de negocio de una aplicación. Se encarga de procesar los datos y devolver una respuesta.
+ * Los servicios son inyectables, lo que significa que pueden ser inyectados en otros componentes como controladores, otros servicios o módulos.
+ * 
+ */
 @Injectable()
 export class ProductService {
 
@@ -18,7 +23,6 @@ export class ProductService {
     private priceHistoryRepository: Repository<PriceHistory>,
     @InjectRepository(Supermarket)
     private supermarketRepository: Repository<Supermarket>,
-    @Inject('PRODUCTS_SERVICE') private rabbitClient: ClientProxy,
   ) { }
 
   async getAllProducts(): Promise<Product[]> {
@@ -204,39 +208,4 @@ export class ProductService {
     return priceHistorySaved;
   }
 
-
-  async markForDeletion(id: number): Promise<void> {
-    const product = await this.productRepository.findOne({ where: { id } });
-
-    if (!product) {
-      throw new ProductNotFoundException(id);
-    }
-
-    product.status = ProductStatus.MARKED_FOR_DELETION;
-    await this.productRepository.save(product);
-
-    const message = {
-      id,
-      status: 'MARKED_FOR_DELETION',
-    };
-
-    console.log('Emitiendo mensaje para eliminar producto:', message);
-
-    try {
-
-      await this.ensureConnected();
-      this.rabbitClient.emit('delete-product', JSON.stringify(message));
-    } catch (error) {
-      console.error(error)
-      throw new RabbitMQException();
-    }
-  }
-
-  private async ensureConnected(): Promise<void> {
-    try {
-      await this.rabbitClient.connect();
-    } catch (error) {
-      throw new Error('RabbitMQ no está conectado: ' + error.message);
-    }
-  }
 }

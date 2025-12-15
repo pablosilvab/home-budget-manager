@@ -9,6 +9,13 @@ import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { Request } from 'express';
 
+/**
+ * AuthGuard es una clase que implementa la interfaz CanActivate de Nest.js
+ * CanActivate es una interfaz que define un método canActivate que se ejecuta antes de que se ejecute un controlador
+ * Este guardia tiene como objetivo verificar si el token JWT es válido
+ * Los Guards en NestJs son clases que implementan una interfaz específica y que se utilizan para proteger rutas. 
+ * Los Guards se ejecutan antes de que se ejecute un controlador y pueden permitir o denegar el acceso a la ruta.
+ */
 @Injectable()
 export class AuthGuard implements CanActivate {
     constructor(private jwtService: JwtService) { }
@@ -26,8 +33,6 @@ export class AuthGuard implements CanActivate {
                     secret: jwtConstants.secret
                 }
             );
-            // 💡 We're assigning the payload to the request object here
-            // so that we can access it in our route handlers
             request['user'] = payload;
         } catch {
             throw new UnauthorizedException();
